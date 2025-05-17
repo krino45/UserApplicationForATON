@@ -10,5 +10,11 @@ namespace UserApplication.Persistence
         : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Login)
+                .IsUnique();
+        }
     }
 }
