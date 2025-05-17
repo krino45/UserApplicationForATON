@@ -70,6 +70,9 @@ namespace UserApplication.Migrations
 
                     b.HasKey("Guid");
 
+                    b.HasIndex("Login")
+                        .IsUnique();
+
                     b.ToTable("Users");
                 });
 #pragma warning restore 612, 618

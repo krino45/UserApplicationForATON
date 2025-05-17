@@ -12,7 +12,7 @@ using UserApplication.Persistence;
 namespace UserApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250517091154_InitialCreate")]
+    [Migration("20250517143250_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -72,6 +72,9 @@ namespace UserApplication.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Guid");
+
+                    b.HasIndex("Login")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

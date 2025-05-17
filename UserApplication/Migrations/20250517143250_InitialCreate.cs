@@ -33,6 +33,12 @@ namespace UserApplication.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Guid);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Login",
+                table: "Users",
+                column: "Login",
+                unique: true);
         }
 
         /// <inheritdoc />

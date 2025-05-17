@@ -1,16 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace UserApplication.API.Models.Dto
+﻿namespace UserApplication.API.Models.Dto
 {
     public class UserResponseDto
     {
+        public Guid Guid { get; set; }
         public string? Name { get; set; }
         public Gender? Gender { get; set; }
         public DateTime? Birthday { get; set; }
         public bool? Admin { get; set; }
         public bool? Active { get; set; }
 
-        public UserResponseDto() {  }
+        public UserResponseDto() { }
         public UserResponseDto(string? name, Gender? gender, DateTime? birthday, bool? admin, bool? active)
         {
             Name = name;
@@ -19,5 +18,5 @@ namespace UserApplication.API.Models.Dto
             Admin = admin;
             Active = active;
         }
-   }
+    }
 }

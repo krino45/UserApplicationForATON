@@ -15,6 +15,12 @@ namespace UserApplication.Persistence
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Login)
                 .IsUnique();
+            modelBuilder
+                .Entity<User>()
+                .Property(e => e.CreatedOn)
+                .HasConversion(
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         }
     }
 }

@@ -21,9 +21,12 @@ namespace UserApplication.Services.UserService
                 Password = CustomPasswordHasher.Hash(dto.Password),
                 Name = dto.Name,
                 Gender = dto.Gender,
-                Birthday = dto.Birthday,
+                Birthday = dto.Birthday.HasValue
+                    ? DateTime.SpecifyKind(dto.Birthday.Value, DateTimeKind.Utc)
+                    : null
+,
                 Admin = dto.Admin,
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 CreatedBy = createdBy,
             };
             await _userRepository.AddAsync(user);
@@ -37,9 +40,11 @@ namespace UserApplication.Services.UserService
             }
             user.Name = dto.Name ?? user.Name;
             user.Gender = dto.Gender ?? user.Gender;
-            user.Birthday = dto.Birthday ?? user.Birthday;
+            user.Birthday = dto.Birthday.HasValue
+                    ? DateTime.SpecifyKind(dto.Birthday.Value, DateTimeKind.Utc)
+                    : user.Birthday;
 
-            user.ModifiedOn = DateTime.Now;
+            user.ModifiedOn = DateTime.UtcNow;
             user.ModifiedBy = modifiedBy;
 
             await _userRepository.UpdateAsync(user);
@@ -63,7 +68,7 @@ namespace UserApplication.Services.UserService
 
             user.Password = CustomPasswordHasher.Hash(password.Password);
 
-            user.ModifiedOn = DateTime.Now;
+            user.ModifiedOn = DateTime.UtcNow;
             user.ModifiedBy = modifiedBy;
 
             await _userRepository.UpdateAsync(user);
@@ -87,7 +92,7 @@ namespace UserApplication.Services.UserService
 
             user.Login = login.Login;
 
-            user.ModifiedOn = DateTime.Now;
+            user.ModifiedOn = DateTime.UtcNow;
             user.ModifiedBy = modifiedBy;
 
             await _userRepository.UpdateAsync(user);
@@ -107,6 +112,7 @@ namespace UserApplication.Services.UserService
             }
             return new UserResponseDto
             {
+                Guid = user.Guid,
                 Name = user.Name,
                 Gender = user.Gender,
                 Birthday = user.Birthday,
@@ -132,6 +138,7 @@ namespace UserApplication.Services.UserService
             }
             return new UserResponseDto
             {
+                Guid = user.Guid,
                 Name = user.Name,
                 Gender = user.Gender,
                 Birthday = user.Birthday,
@@ -141,7 +148,7 @@ namespace UserApplication.Services.UserService
         }
         public async Task<List<User>> GetOlderThanAsync(DateTime time)
         {
-            return (await _userRepository.GetAllByAsync(user => user.Birthday >= time))
+            return (await _userRepository.GetAllByAsync(user => user.Birthday < time))
                            .ToList();
         }
         public async Task<bool> DeleteByLoginAsync(string login, bool softDelete = false, string? revokedBy = null)
@@ -154,7 +161,7 @@ namespace UserApplication.Services.UserService
 
             if (softDelete)
             {
-                user.RevokedOn = DateTime.Now;
+                user.RevokedOn = DateTime.UtcNow;
                 user.RevokedBy = revokedBy;
                 await _userRepository.UpdateAsync(user);
             }
@@ -175,6 +182,8 @@ namespace UserApplication.Services.UserService
 
             user.RevokedOn = null;
             user.RevokedBy = null;
+
+            await _userRepository.UpdateAsync(user);
             return true;
         }
     }
