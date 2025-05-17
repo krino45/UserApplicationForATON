@@ -1,23 +1,57 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using UserApplication.API.Models;
 using UserApplication.Persistence;
+using UserApplication.Persistence.Repositories.UserRepository;
+using UserApplication.Services.UserService;
 
 namespace UserApplication
 {
     public class Program
     {
+        public class AuthOptions
+        {
+            public const string ISSUER = "UserAuthServer";
+            public const string AUDIENCE = "UserAuthClient";
+            public static SymmetricSecurityKey GetSymmetricSecurityKey(string key) =>
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+        }
+
         async public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
+                {
+                    opt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = AuthOptions.ISSUER,
+                        ValidateAudience = true,
+                        ValidAudience = AuthOptions.AUDIENCE,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(builder.Configuration["SecretKey"]!),
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
 
+            // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
-            
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
@@ -46,6 +80,8 @@ namespace UserApplication
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();

@@ -114,7 +114,12 @@ namespace UserApplication.Services.UserService
                 Active = user.RevokedBy == null,
             };
         }
-        public async Task<UserResponseDto?> ValidateCredentialsAsync(string login, string password)
+        public async Task<User?> GetById(Guid id)
+        {
+            return await _userRepository.GetByIdAsync(id);
+        }
+
+        public async Task<UserResponseDto> ValidateCredentialsAsync(string login, string password)
         {
             var user = await _userRepository.GetByLoginAsync(login);
             if (user == null)
@@ -134,7 +139,7 @@ namespace UserApplication.Services.UserService
                 Active = user.RevokedBy == null,
             };
         }
-        public async Task<List<User>> GetOlderThanAsync(DateTime? time)
+        public async Task<List<User>> GetOlderThanAsync(DateTime time)
         {
             return (await _userRepository.GetAllByAsync(user => user.Birthday >= time))
                            .ToList();
