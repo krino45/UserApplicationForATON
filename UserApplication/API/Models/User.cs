@@ -11,6 +11,7 @@ namespace UserApplication.API.Models
 
     public class User
     {
+        [Key]
         public Guid Guid { get; set; }
         [Required(ErrorMessage = "Login is required.")]
         [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Login can only contain Latin letters and digits.")]
