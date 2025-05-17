@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using UserApplication.API.Models;
 
-namespace UserApplication.Controllers
+namespace UserApplication.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -19,9 +20,9 @@ namespace UserApplication.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<User> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            return Enumerable.Range(1, 5).Select(index => new User
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),
